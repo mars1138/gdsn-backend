@@ -17,10 +17,10 @@ const productSchema = new Schema({
   maxTemp: { type: String },
   storageInstructions: { type: String },
   subscribers: [{ type: Number }],
-  dateAdded: { type: Number },
-  datePublished: { type: Number },
-  dateInactive: { type: Number },
-  dateModified: { type: Number },
+  dateAdded: { type: Date },
+  datePublished: { type: Date },
+  dateInactive: { type: Date },
+  dateModified: { type: Date },
   owner: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 });
 
