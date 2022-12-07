@@ -10,7 +10,29 @@ const User = require('../models/user');
 
 const getProductById = async (req, res, next) => {
   const prodId = req.params.pid;
-  res.status(200).json({ message: 'get request received!', product: prodId });
+
+  let product;
+
+  try {
+    product = await Product.find({ gtin: prodId });
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not find product',
+      500,
+    );
+
+    return next(error);
+  }
+
+  if (!product) {
+    const error = new HttpError(
+      'Could not find a place for the provided id',
+      404,
+    );
+    return next(error);
+  }
+
+  res.json({ message: 'get request received!', product });
 };
 
 const getProductsByUserId = async (req, res, next) => {};
@@ -20,7 +42,7 @@ const createProduct = async (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log(errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
+      new HttpError('Invalid inputs passed, please check your data.', 422),
     );
   }
 
@@ -33,7 +55,20 @@ const createProduct = async (req, res, next) => {
     category,
     type,
     image,
+    height,
+    width,
+    depth,
+    weight,
+    packagingType,
+    tempUnits,
+    minTemp,
+    maxTemp,
+    storageInstructions,
     subscribers,
+    dateAdded,
+    datePublished,
+    dateInactive,
+    dateModified,
   } = req.body;
 
   const createdProd = new Product({
@@ -43,14 +78,41 @@ const createProduct = async (req, res, next) => {
     category,
     type,
     image,
+    height,
+    width,
+    depth,
+    weight,
+    packagingType,
+    tempUnits,
+    minTemp,
+    maxTemp,
+    storageInstructions,
     subscribers,
+    dateAdded,
+    datePublished,
+    dateInactive,
+    dateModified,
   });
 
-  console.log(createdProd);
+  console.log('createdProd: ', createdProd);
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdProd.save({ session: sess });
+    // user.places.push(createdPlace);
+    // await user.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    console.log(err.message);
+    const error = new HttpError(
+      'Creating place failed, please try again!',
+      500,
+    );
+    return next(error);
+  }
 
   res.status(201).json({ product: createdProd });
-
-  //   res.status(201).json({ message: 'Post request received!' });
 };
 
 const updateProduct = async (req, res, next) => {};

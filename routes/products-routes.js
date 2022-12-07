@@ -13,22 +13,22 @@ router.get('/:pid', productsControllers.getProductById);
 
 router.get('/user/:uid', productsControllers.getProductsByUserId);
 
-
 router.post(
   '/',
   //   fileUpload.single('image'),
-  //   [
-  //     check('name').not().isEmpty(),
-  //     check('description').isLength({ min: 10 }),
-  //     check('gtin').isLength({ min: 14 }),
-  //   ],
-  productsControllers.createProduct
+  [
+    check('name').not().isEmpty(),
+    check('description').isLength({ min: 10 }),
+    check('gtin').isLength({ min: 14, max: 14 }),
+    check('category').isNumeric(),
+  ],
+  productsControllers.createProduct,
 );
 
 router.patch(
   '/:pid',
   [check('name').not().isEmpty(), check('description').isLength({ min: 10 })],
-  productsControllers.updateProduct
+  productsControllers.updateProduct,
 );
 
 router.delete('/:pid', productsControllers.deleteProduct);

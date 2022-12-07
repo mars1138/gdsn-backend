@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 
 app.use('/uploads/images', express.static(path.join('uploads', 'images')));
 
+app.use(cors());
 // app.use(cors({ origin: `${process.env.CLIENT_URL}` }));
 
 app.use('/api/products', productsRoutes);
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   if (req.file) {
     console.log('req.file.path: ', req.file.path);
-    fs.unlink(req.file.path, (error) => {
+    fs.unlink(req.file.path, error => {
       console.log(error);
     });
   }
@@ -39,15 +40,13 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-app.listen(5000);
-
 // object added as 2nd argument for connect() as workaround to avoid error: User validation failed: _id: Error, expected `_id` to be unique. Value: `.....`
 // occurs if user database in mongoDB has more than 1 user
 // must use mongoose 5.11.3 and mongoose-unique-validator 2.0.3 until solution can be found
-// mongoose
-//   .connect(
-//     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ffsce.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
-//     { useNewUrlParser: true, useUnifiedTopology: true }
-//   )
-//   .then(() => app.listen(process.env.PORT || 5000))
-//   .catch((err) => console.log(err));
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ykppkft.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+  )
+  .then(() => app.listen(process.env.PORT || 5000))
+  .catch(err => console.log(err));
