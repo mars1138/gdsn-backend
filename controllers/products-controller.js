@@ -19,7 +19,7 @@ const getProductById = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not find product',
-      500,
+      500
     );
 
     return next(error);
@@ -28,7 +28,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       'Could not find a place for the provided id',
-      404,
+      404
     );
     return next(error);
   }
@@ -43,7 +43,7 @@ const createProduct = async (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log(errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422),
+      new HttpError('Invalid inputs passed, please check your data.', 422)
     );
   }
 
@@ -108,7 +108,7 @@ const createProduct = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Creating place failed, please try again!',
-      500,
+      500
     );
     return next(error);
   }
@@ -120,7 +120,7 @@ const updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422),
+      new HttpError('Invalid inputs passed, please check your data', 422)
     );
   }
 
@@ -157,7 +157,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500,
+      500
     );
 
     return next(error);
@@ -195,12 +195,12 @@ const updateProduct = async (req, res, next) => {
   console.log('product: ', product);
 
   try {
-    await product.forEach(item => item.save());
+    await product[0].save();
   } catch (err) {
     console.log(err);
     const error = new HttpError(
       'Something went wrong, could not update place',
-      500,
+      500
     );
     return next(error);
   }
@@ -208,7 +208,61 @@ const updateProduct = async (req, res, next) => {
   res.status(200).json({ product: product[0].toObject({ getters: true }) });
 };
 
-const deleteProduct = async (req, res, next) => {};
+const deleteProduct = async (req, res, next) => {
+  const prodId = req.params.pid;
+
+  let deleteProd;
+
+  try {
+    deleteProd = await Product.find({ gtin: prodId });
+    console.log('deleteProd: ', deleteProd);
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not delete product',
+      500
+    );
+
+    return next(error);
+  }
+
+  if (!deleteProd || deleteProd.length === 0) {
+    const error = new HttpError('Could not find product for this id', 404);
+    return next(error);
+  }
+
+  // if (deleteProd.owner.id !== req.userData.userId) {
+  //   const error = new HttpError(
+  //     'You are not authorized to delete this product.',
+  //     401
+  //   );
+  //   return next(error);
+  // }
+
+  // const imagePath = deleteProd.image;
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await deleteProd[0].remove({ session: sess });
+    // deleteProd.owner.places.pull(deleteProd);
+    // await deleteProd.owner.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not complete product delete',
+      500
+    );
+    return next(error);
+  }
+
+  // fs.unlink(imagePath, (err) => {
+  //   console.log(err);
+  // });
+
+  res.status(200).json({
+    message: `Product ${prodId} ${deleteProd[0].name} has been deleted`,
+  });
+};
 
 exports.getProductById = getProductById;
 exports.getProductsByUserId = getProductsByUserId;
