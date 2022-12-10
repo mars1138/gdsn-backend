@@ -10,10 +10,11 @@ router.post(
   '/',
   [
     check('name').not().isEmpty(),
+    check('company').not().isEmpty(),
     check('email').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
   ],
-  contactController.createContactItem
+  contactController.createContactItem,
 );
 
 router.get('/', contactController.getContactItems);
