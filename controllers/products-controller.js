@@ -19,7 +19,7 @@ const getProductById = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not find product',
-      500
+      500,
     );
 
     return next(error);
@@ -28,7 +28,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       'Could not find a place for the provided id',
-      404
+      404,
     );
     return next(error);
   }
@@ -39,15 +39,15 @@ const getProductById = async (req, res, next) => {
 const getProductsByUserId = async (req, res, next) => {};
 
 const createProduct = async (req, res, next) => {
+  console.log('req.body: ', req.body);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
+    console.log('validationResult: ', errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
+      new HttpError('Invalid inputs passed, please check your data.', 422),
     );
   }
-
-  console.log('req.body: ', req.body);
 
   const {
     name,
@@ -67,9 +67,6 @@ const createProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     dateAdded,
-    datePublished,
-    dateInactive,
-    dateModified,
   } = req.body;
 
   const createdProd = new Product({
@@ -90,9 +87,6 @@ const createProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     dateAdded,
-    datePublished,
-    dateInactive,
-    dateModified,
   });
 
   console.log('createdProd: ', createdProd);
@@ -108,7 +102,7 @@ const createProduct = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Creating place failed, please try again!',
-      500
+      500,
     );
     return next(error);
   }
@@ -120,7 +114,7 @@ const updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422)
+      new HttpError('Invalid inputs passed, please check your data', 422),
     );
   }
 
@@ -157,7 +151,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500
+      500,
     );
 
     return next(error);
@@ -199,8 +193,8 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     const error = new HttpError(
-      'Something went wrong, could not update place',
-      500
+      'Something went wrong, could not update product',
+      500,
     );
     return next(error);
   }
@@ -219,7 +213,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not delete product',
-      500
+      500,
     );
 
     return next(error);
@@ -250,7 +244,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not complete product delete',
-      500
+      500,
     );
     return next(error);
   }
