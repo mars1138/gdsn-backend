@@ -20,6 +20,7 @@ const createContactItem = async (req, res, next) => {
     email,
     phone: phone || null,
     comments: comments || '',
+    date: new Date().toISOString(),
   });
 
   try {
