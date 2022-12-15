@@ -63,7 +63,8 @@ const signup = async (req, res, next) => {
     company,
     email,
     password: hashedPassword,
-    places: [],
+    created: new Date().toISOString(),
+    products: [],
   });
 
   try {
@@ -90,9 +91,14 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res
-    .status(201)
-    .json({ userId: createdUser.id, email: createdUser.email, token: token });
+  res.status(201).json({
+    message: 'Signup successful!',
+    userData: {
+      userId: createdUser.id,
+      email: createdUser.email,
+      token: token,
+    },
+  });
 };
 
 const login = async (req, res, next) => {

@@ -87,16 +87,33 @@ const createProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     dateAdded,
+    owner: req.userData.userId,
   });
 
   console.log('createdProd: ', createdProd);
+
+  let user;
+
+  try {
+    user = await User.findById(req.userData.userId);
+  } catch (err) {
+    const error = new HttpError('Creating place failed, please try again', 500);
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError('Could not find user for provided id', 404);
+    return next(error);
+  }
+
+  console.log(user);
 
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await createdProd.save({ session: sess });
-    // user.places.push(createdPlace);
-    // await user.save({ session: sess });
+    user.products.push(createdProd);
+    await user.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
     console.log(err.message);

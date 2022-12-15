@@ -21,7 +21,7 @@ const productSchema = new Schema({
   datePublished: { type: Date },
   dateInactive: { type: Date },
   dateModified: { type: Date },
-  //   owner: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+    owner: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 });
 
 module.exports = mongoose.model('Product', productSchema);
