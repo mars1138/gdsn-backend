@@ -15,7 +15,7 @@ const getUsers = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ users: users.map(user => user.toObject({ getters: true })) });
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
@@ -23,7 +23,7 @@ const signup = async (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log(errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422),
+      new HttpError('Invalid inputs passed, please check your data', 422)
     );
   }
 
@@ -53,7 +53,7 @@ const signup = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       'Could not create new user, please try again (bcrypt)',
-      500,
+      500
     );
     return next(error);
   }
@@ -73,7 +73,7 @@ const signup = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Signup failed, unable to create user.  Please try again!',
-      500,
+      500
     );
     return next(error);
   }
@@ -84,7 +84,7 @@ const signup = async (req, res, next) => {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
       process.env.JWT_KEY,
-      { expiresIn: '1h' },
+      { expiresIn: '1h' }
     );
   } catch (err) {
     const error = new HttpError('Signup failed, please try again!', 500);
@@ -120,18 +120,17 @@ const login = async (req, res, next) => {
   if (!existingUser) {
     const error = new HttpError(
       'Invalid credentials, could not log you in',
-      403,
+      403
     );
     return next(error);
   }
 
   try {
     isValidPassword = await bcrypt.compare(password, existingUser.password);
-    console.log(isValidPassword);
   } catch (err) {
     const error = new HttpError(
       'Could not log you in, please check credentials and try again',
-      500,
+      500
     );
     return next(error);
   }
@@ -139,7 +138,7 @@ const login = async (req, res, next) => {
   if (!isValidPassword) {
     const error = new HttpError(
       'Invalid credentials, unable to log you in',
-      401,
+      401
     );
     return next(error);
   }
@@ -148,7 +147,7 @@ const login = async (req, res, next) => {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
       process.env.JWT_KEY,
-      { expiresIn: '1h' },
+      { expiresIn: '1h' }
     );
     console.log('token: ', token);
   } catch (err) {

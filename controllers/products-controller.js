@@ -19,7 +19,7 @@ const getProductById = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not find product',
-      500,
+      500
     );
 
     return next(error);
@@ -28,7 +28,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       'Could not find a place for the provided id',
-      404,
+      404
     );
     return next(error);
   }
@@ -36,7 +36,31 @@ const getProductById = async (req, res, next) => {
   res.json({ product: product[0].toObject({ getters: true }) });
 };
 
-const getProductsByUserId = async (req, res, next) => {};
+const getProductsByUserId = async (req, res, next) => {
+  const userId = req.params.uid;
+
+  let userWithProducts;
+
+  try {
+    userWithProducts = await User.findById(userId).populate('products');
+  } catch (err) {
+    const error = new HttpError(
+      'Fetching user products failed, please try again',
+      500
+    );
+    return next(error);
+  }
+
+  if (!userWithProducts) {
+    return next('Could not find products for the provided user id', 404);
+  }
+
+  res.json({
+    products: userWithProducts.products.map((product) =>
+      product.toObject({ getters: true })
+    ),
+  });
+};
 
 const createProduct = async (req, res, next) => {
   console.log('req.body: ', req.body);
@@ -45,7 +69,7 @@ const createProduct = async (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log('validationResult: ', errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422),
+      new HttpError('Invalid inputs passed, please check your data.', 422)
     );
   }
 
@@ -67,6 +91,9 @@ const createProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     dateAdded,
+    datePublished,
+    dateInactive,
+    dateModified,
   } = req.body;
 
   const createdProd = new Product({
@@ -87,6 +114,9 @@ const createProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     dateAdded,
+    datePublished,
+    dateInactive,
+    dateModified,
     owner: req.userData.userId,
   });
 
@@ -119,7 +149,7 @@ const createProduct = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Creating place failed, please try again!',
-      500,
+      500
     );
     return next(error);
   }
@@ -131,7 +161,7 @@ const updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422),
+      new HttpError('Invalid inputs passed, please check your data', 422)
     );
   }
 
@@ -168,7 +198,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500,
+      500
     );
 
     return next(error);
@@ -211,7 +241,7 @@ const updateProduct = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500,
+      500
     );
     return next(error);
   }
@@ -230,7 +260,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not delete product',
-      500,
+      500
     );
 
     return next(error);
@@ -261,7 +291,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not complete product delete',
-      500,
+      500
     );
     return next(error);
   }

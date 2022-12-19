@@ -31,7 +31,7 @@ router.post(
     // check('minTemp').isNumeric(),
     // check('maxTemp').isNumeric(),
   ],
-  productsControllers.createProduct,
+  productsControllers.createProduct
 );
 
 router.patch(
@@ -40,18 +40,18 @@ router.patch(
     check('name').not().isEmpty(),
     check('description').isLength({ min: 10 }),
     check('gtin').isLength({ min: 14, max: 14 }),
-    check('category').isNumeric(),
-    check('type').isNumeric(),
-    check('height').isNumeric(),
-    check('width').isNumeric(),
-    check('depth').isNumeric(),
-    check('weight').isNumeric(),
-    check('packagingType').isNumeric(),
-    check('tempUnits').isNumeric(),
-    check('minTemp').isNumeric(),
-    check('maxTemp').isNumeric(),
+    // check('category').isNumeric(),
+    // check('type').isNumeric(),
+    // check('height').isNumeric(),
+    // check('width').isNumeric(),
+    // check('depth').isNumeric(),
+    // check('weight').isNumeric(),
+    // check('packagingType').isNumeric(),
+    // check('tempUnits').isNumeric(),
+    // check('minTemp').isNumeric(),
+    // check('maxTemp').isNumeric(),
   ],
-  productsControllers.updateProduct,
+  productsControllers.updateProduct
 );
 
 router.delete('/:pid', productsControllers.deleteProduct);
