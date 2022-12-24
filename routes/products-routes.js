@@ -15,7 +15,7 @@ router.get('/user/:uid', productsControllers.getProductsByUserId);
 
 router.post(
   '/',
-  //   fileUpload.single('image'),
+  fileUpload.single('image'),
   [
     check('name').not().isEmpty(),
     check('description').isLength({ min: 10 }),
@@ -36,6 +36,7 @@ router.post(
 
 router.patch(
   '/:pid',
+  fileUpload.single('image'),
   [
     check('name').not().isEmpty(),
     check('description').isLength({ min: 10 }),

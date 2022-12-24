@@ -102,7 +102,7 @@ const createProduct = async (req, res, next) => {
     gtin,
     category,
     type,
-    image,
+    image: req.file ? req.file.path : null,
     height,
     width,
     depth,
@@ -113,10 +113,10 @@ const createProduct = async (req, res, next) => {
     maxTemp,
     storageInstructions,
     subscribers,
-    dateAdded,
-    datePublished,
-    dateInactive,
-    dateModified,
+    dateAdded: new Date().toISOString(),
+    datePublished: null,
+    dateInactive: null,
+    dateModified: null,
     owner: req.userData.userId,
   });
 
@@ -183,9 +183,9 @@ const updateProduct = async (req, res, next) => {
     storageInstructions,
     subscribers,
     // dateAdded,
-    datePublished,
-    dateInactive,
-    dateModified,
+    // datePublished,
+    // dateInactive,
+    // dateModified,
   } = req.body;
 
   const prodId = req.params.pid;
