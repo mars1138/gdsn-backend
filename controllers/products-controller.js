@@ -90,10 +90,10 @@ const createProduct = async (req, res, next) => {
     maxTemp,
     storageInstructions,
     subscribers,
-    dateAdded,
-    datePublished,
-    dateInactive,
-    dateModified,
+    // dateAdded,
+    // datePublished,
+    // dateInactive,
+    // dateModified,
   } = req.body;
 
   const createdProd = new Product({
@@ -171,7 +171,7 @@ const updateProduct = async (req, res, next) => {
     // gtin,
     category,
     // type,
-    image,
+    // image,
     height,
     width,
     depth,
@@ -217,7 +217,7 @@ const updateProduct = async (req, res, next) => {
   // gtin,
   product[0].category = category;
   // type,
-  product[0].image = image;
+  product[0].image = req.file ? req.file.path : null;
   product[0].height = height;
   product[0].width = width;
   product[0].depth = depth;
@@ -229,9 +229,9 @@ const updateProduct = async (req, res, next) => {
   product[0].storageInstructions = storageInstructions;
   product[0].subscribers = subscribers;
   // dateAdded,
-  product[0].datePublished = datePublished;
-  product[0].dateInactive = dateInactive;
-  product[0].dateModified = dateModified;
+  // product[0].datePublished = datePublished;
+  // product[0].dateInactive = dateInactive;
+  product[0].dateModified = new Date().toISOString();
 
   console.log('product: ', product);
 
