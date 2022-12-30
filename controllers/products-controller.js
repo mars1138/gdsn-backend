@@ -112,7 +112,7 @@ const createProduct = async (req, res, next) => {
     minTemp,
     maxTemp,
     storageInstructions,
-    subscribers,
+    subscribers: [],
     dateAdded: new Date().toISOString(),
     datePublished: null,
     dateInactive: null,
@@ -188,6 +188,8 @@ const updateProduct = async (req, res, next) => {
     // dateModified,
   } = req.body;
 
+  console.log('subscribers: ', subscribers);
+
   const prodId = req.params.pid;
 
   let product;
@@ -212,22 +214,22 @@ const updateProduct = async (req, res, next) => {
   //   return next(error);
   // }
 
-  product[0].name = name;
-  product[0].description = description;
+  if (name) product[0].name = name;
+  if (description) product[0].description = description;
   // gtin,
-  product[0].category = category;
+  if (category) product[0].category = category;
   // type,
-  product[0].image = req.file ? req.file.path : null;
-  product[0].height = height;
-  product[0].width = width;
-  product[0].depth = depth;
-  product[0].weight = weight;
-  product[0].packagingType = packagingType;
-  product[0].tempUnits = tempUnits;
-  product[0].minTemp = minTemp;
-  product[0].maxTemp = maxTemp;
-  product[0].storageInstructions = storageInstructions;
-  product[0].subscribers = subscribers;
+  if (req.file) product[0].image = req.file.path;
+  if (height) product[0].height = height;
+  if (width) product[0].width = width;
+  if (depth) product[0].depth = depth;
+  if (weight) product[0].weight = weight;
+  if (packagingType) product[0].packagingType = packagingType;
+  if (tempUnits) product[0].tempUnits = tempUnits;
+  if (minTemp) product[0].minTemp = minTemp;
+  if (maxTemp) product[0].maxTemp = maxTemp;
+  if (storageInstructions) product[0].storageInstructions = storageInstructions;
+  product[0].subscribers = [...subscribers];
   // dateAdded,
   // product[0].datePublished = datePublished;
   // product[0].dateInactive = dateInactive;
