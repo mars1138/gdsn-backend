@@ -219,7 +219,6 @@ const updateProduct = async (req, res, next) => {
   // gtin,
   if (category) product[0].category = category;
   // type,
-  if (req.file) product[0].image = req.file.path;
   if (height) product[0].height = height;
   if (width) product[0].width = width;
   if (depth) product[0].depth = depth;
@@ -229,9 +228,33 @@ const updateProduct = async (req, res, next) => {
   if (minTemp) product[0].minTemp = minTemp;
   if (maxTemp) product[0].maxTemp = maxTemp;
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
-  product[0].subscribers = [...subscribers];
+
+  console.log(req.file);
+  console.log(product[0].image);
+  if (req.file) {
+    fs.unlink(product[0].image, (error) => {
+      console.log('app.use: ', error);
+    });
+    product[0].image = req.file.path;
+  }
+
+  if (subscribers[0]) {
+    const subArray = subscribers.split(',');
+    product[0].subscribers = [];
+    subArray.forEach((sub) => product[0].subscribers.push(+sub));
+    // subscribers.forEach((sub) => product[0].subscribers.push(+sub));
+    product[0].datePublished = new Date().toISOString();
+  }
+  // if (subscribers[0] && subscribers.length === 1) {
+  //   product[0].subscribers = subscribers;
+  //   product[0].datePublished = new Date().toISOString();
+  // }
+  if (!subscribers[0] || !subscribers) {
+    product[0].subscribers = [];
+    product[0].datePublished = null;
+  }
+  // product[0].subscribers = [...subscribers];
   // dateAdded,
-  // product[0].datePublished = datePublished;
   // product[0].dateInactive = dateInactive;
   product[0].dateModified = new Date().toISOString();
 

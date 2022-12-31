@@ -6,9 +6,9 @@ const productSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   gtin: { type: Number, required: true, unique: true },
-  category: { type: Number },
-  type: { type: Number },
-  image: { type: String },
+  category: { type: Number, required: true },
+  type: { type: Number, required: true },
+  image: { type: String, required: true },
   height: { type: String },
   weight: { type: String },
   packagingType: { type: Number },
@@ -21,7 +21,7 @@ const productSchema = new Schema({
   datePublished: { type: Date },
   dateInactive: { type: Date },
   dateModified: { type: Date },
-    owner: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+  owner: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 });
 
 module.exports = mongoose.model('Product', productSchema);
