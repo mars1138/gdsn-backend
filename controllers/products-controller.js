@@ -188,7 +188,7 @@ const updateProduct = async (req, res, next) => {
     // dateModified,
   } = req.body;
 
-  console.log('subscribers: ', subscribers);
+  // console.log('subscribers: ', subscribers);
 
   const prodId = req.params.pid;
 
@@ -229,8 +229,8 @@ const updateProduct = async (req, res, next) => {
   if (maxTemp) product[0].maxTemp = maxTemp;
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
 
-  console.log(req.file);
-  console.log('dateInactive: ', dateInactive);
+  // console.log(req.file);
+  // console.log('dateInactive: ', dateInactive);
   if (req.file) {
     fs.unlink(product[0].image, (error) => {
       console.log('app.use: ', error);
@@ -308,8 +308,6 @@ const deleteProduct = async (req, res, next) => {
   //   return next(error);
   // }
 
-  // const imagePath = deleteProd.image;
-
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -325,9 +323,10 @@ const deleteProduct = async (req, res, next) => {
     return next(error);
   }
 
-  // fs.unlink(imagePath, (err) => {
-  //   console.log(err);
-  // });
+  const imagePath = deleteProd[0].image;
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
 
   res.status(200).json({
     message: `Product ${prodId} ${deleteProd[0].name} has been deleted`,
