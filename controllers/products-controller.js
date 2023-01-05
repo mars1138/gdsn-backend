@@ -184,7 +184,7 @@ const updateProduct = async (req, res, next) => {
     subscribers,
     // dateAdded,
     // datePublished,
-    // dateInactive,
+    dateInactive,
     // dateModified,
   } = req.body;
 
@@ -230,7 +230,7 @@ const updateProduct = async (req, res, next) => {
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
 
   console.log(req.file);
-  console.log(product[0].image);
+  console.log('dateInactive: ', dateInactive);
   if (req.file) {
     fs.unlink(product[0].image, (error) => {
       console.log('app.use: ', error);
@@ -255,7 +255,11 @@ const updateProduct = async (req, res, next) => {
   }
   // product[0].subscribers = [...subscribers];
   // dateAdded,
-  // product[0].dateInactive = dateInactive;
+  if (dateInactive === new Date(0).toISOString()) {
+    product[0].dateInactive = null;
+  } else {
+    product[0].dateInactive = dateInactive;
+  }
   product[0].dateModified = new Date().toISOString();
 
   console.log('product: ', product);
