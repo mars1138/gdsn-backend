@@ -8,7 +8,7 @@ const contactSchema = new Schema({
   email: { type: String, required: true },
   phone: { type: Number },
   comments: { type: String },
-  date: {type: Date}
+  date: { type: Date },
 });
 
 module.exports = mongoose.model('Contact', contactSchema);

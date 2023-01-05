@@ -7,7 +7,7 @@ const createContactItem = async (req, res, next) => {
 
   if (!errors.isEmpty()) {
     const error = new HttpError(
-      'Invalid inputs received, please check your data',
+      'Invalid inputs received, please check your data'
     );
     return next(error);
   }
@@ -28,7 +28,7 @@ const createContactItem = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Error sending contact info, please try again',
-      500,
+      500
     );
     return next(error);
   }
@@ -47,7 +47,7 @@ const getContactItems = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Fetching contacts failed, please try again',
-      500,
+      500
     );
     return next(error);
   }
@@ -58,7 +58,7 @@ const getContactItems = async (req, res, next) => {
   }
 
   res.json({
-    contact: contactItems.map(contact => contact.toObject({ getter: true })),
+    contact: contactItems.map((contact) => contact.toObject({ getter: true })),
   });
 };
 

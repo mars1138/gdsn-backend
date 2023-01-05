@@ -14,7 +14,7 @@ router.post(
     check('email').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
   ],
-  contactController.createContactItem,
+  contactController.createContactItem
 );
 
 router.get('/', contactController.getContactItems);

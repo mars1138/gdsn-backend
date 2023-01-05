@@ -15,13 +15,13 @@ router.post(
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 }),
   ],
-  usersControllers.signup,
+  usersControllers.signup
 );
 
 router.post(
   '/login',
   [check('email').normalizeEmail().isEmail()],
-  usersControllers.login,
+  usersControllers.login
 );
 
 module.exports = router;
