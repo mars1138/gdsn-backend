@@ -206,10 +206,10 @@ const updateProduct = async (req, res, next) => {
     return next(error);
   }
 
-  // if (product.owner.toString() !== req.userData.userId) {
+  // if (product.owner !== req.userData.userId) {
   //   const error = new HttpError(
   //     'You are not authorized to edit this place.',
-  //     401,
+  //     401
   //   );
   //   return next(error);
   // }
@@ -281,11 +281,14 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   const prodId = req.params.pid;
 
-  let deleteProd;
+  let deleteProd, deleteUser;
 
   try {
     deleteProd = await Product.find({ gtin: prodId });
     console.log('deleteProd: ', deleteProd);
+    console.log('deleteProdOwner: ', deleteProd[0].owner);
+    deleteUser = await User.findById(deleteProd[0].owner);
+    console.log('deleteUser: ', deleteUser);
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not delete product',
@@ -312,8 +315,8 @@ const deleteProduct = async (req, res, next) => {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await deleteProd[0].remove({ session: sess });
-    // deleteProd.owner.places.pull(deleteProd);
-    // await deleteProd.owner.save({ session: sess });
+    deleteUser.products.pull(deleteProd[0].id);
+    await deleteUser.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
