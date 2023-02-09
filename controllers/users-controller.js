@@ -21,13 +21,13 @@ const getUsers = async (req, res, next) => {
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
+    // console.log(errors);
     return next(
       new HttpError('Invalid inputs passed, please check your data', 422)
     );
   }
 
-  console.log(req.body);
+  // console.log(req.body);
 
   const { name, company, email, password } = req.body;
   let existingUser;

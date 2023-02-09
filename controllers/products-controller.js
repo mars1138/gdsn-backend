@@ -1,4 +1,4 @@
-const uuid = require('uuid').v4;
+// const uuid = require('uuid').v4;
 const fs = require('fs');
 
 const { validationResult } = require('express-validator');
@@ -15,11 +15,11 @@ const getProductById = async (req, res, next) => {
 
   try {
     product = await Product.find({ gtin: prodId });
-    console.log('loaded product: ', product);
+    // console.log('loaded product: ', product);
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not find product',
-      500
+      500,
     );
 
     return next(error);
@@ -28,7 +28,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       'Could not find a place for the provided id',
-      404
+      404,
     );
     return next(error);
   }
@@ -46,7 +46,7 @@ const getProductsByUserId = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Fetching user products failed, please try again',
-      500
+      500,
     );
     return next(error);
   }
@@ -56,8 +56,8 @@ const getProductsByUserId = async (req, res, next) => {
   }
 
   res.json({
-    products: userWithProducts.products.map((product) =>
-      product.toObject({ getters: true })
+    products: userWithProducts.products.map(product =>
+      product.toObject({ getters: true }),
     ),
   });
 };
@@ -67,9 +67,9 @@ const createProduct = async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log('validationResult: ', errors);
+    // console.log('validationResult: ', errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
+      new HttpError('Invalid inputs passed, please check your data.', 422),
     );
   }
 
@@ -120,7 +120,7 @@ const createProduct = async (req, res, next) => {
     owner: req.userData.userId,
   });
 
-  console.log('createdProd: ', createdProd);
+  // console.log('createdProd: ', createdProd);
 
   let user;
 
@@ -136,7 +136,7 @@ const createProduct = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(user);
+  // console.log(user);
 
   try {
     const sess = await mongoose.startSession();
@@ -149,7 +149,7 @@ const createProduct = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Creating place failed, please try again!',
-      500
+      500,
     );
     return next(error);
   }
@@ -161,7 +161,7 @@ const updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422)
+      new HttpError('Invalid inputs passed, please check your data', 422),
     );
   }
 
@@ -200,19 +200,22 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500
+      500,
     );
 
     return next(error);
   }
 
-  // if (product.owner !== req.userData.userId) {
-  //   const error = new HttpError(
-  //     'You are not authorized to edit this place.',
-  //     401
-  //   );
-  //   return next(error);
-  // }
+  // console.log(product[0].owner);
+  // console.log(req.userData.userId);
+
+  if (product[0].owner != req.userData.userId) {
+    const error = new HttpError(
+      'You are not authorized to edit this place.',
+      401,
+    );
+    return next(error);
+  }
 
   if (name) product[0].name = name;
   if (description) product[0].description = description;
@@ -229,11 +232,9 @@ const updateProduct = async (req, res, next) => {
   if (maxTemp) product[0].maxTemp = maxTemp;
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
 
-  // console.log(req.file);
-  // console.log('dateInactive: ', dateInactive);
   if (req.file) {
-    fs.unlink(product[0].image, (error) => {
-      console.log('app.use: ', error);
+    fs.unlink(product[0].image, error => {
+      // console.log('app.use: ', error);
     });
     product[0].image = req.file.path;
   }
@@ -241,20 +242,15 @@ const updateProduct = async (req, res, next) => {
   if (subscribers[0]) {
     const subArray = subscribers.split(',');
     product[0].subscribers = [];
-    subArray.forEach((sub) => product[0].subscribers.push(+sub));
-    // subscribers.forEach((sub) => product[0].subscribers.push(+sub));
+    subArray.forEach(sub => product[0].subscribers.push(+sub));
     product[0].datePublished = new Date().toISOString();
   }
-  // if (subscribers[0] && subscribers.length === 1) {
-  //   product[0].subscribers = subscribers;
-  //   product[0].datePublished = new Date().toISOString();
-  // }
+
   if (!subscribers[0] || !subscribers) {
     product[0].subscribers = [];
     product[0].datePublished = null;
   }
-  // product[0].subscribers = [...subscribers];
-  // dateAdded,
+
   if (dateInactive === new Date(0).toISOString()) {
     product[0].dateInactive = null;
   } else {
@@ -262,7 +258,7 @@ const updateProduct = async (req, res, next) => {
   }
   product[0].dateModified = new Date().toISOString();
 
-  console.log('product: ', product);
+  // console.log('product: ', product);
 
   try {
     await product[0].save();
@@ -270,7 +266,7 @@ const updateProduct = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500
+      500,
     );
     return next(error);
   }
@@ -292,7 +288,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not delete product',
-      500
+      500,
     );
 
     return next(error);
@@ -303,13 +299,16 @@ const deleteProduct = async (req, res, next) => {
     return next(error);
   }
 
-  // if (deleteProd.owner.id !== req.userData.userId) {
-  //   const error = new HttpError(
-  //     'You are not authorized to delete this product.',
-  //     401
-  //   );
-  //   return next(error);
-  // }
+  // console.log(deleteProd[0].owner);
+  // console.log(req.userData.userId);
+
+  if (deleteProd[0].owner != req.userData.userId) {
+    const error = new HttpError(
+      'You are not authorized to delete this product.',
+      401,
+    );
+    return next(error);
+  }
 
   try {
     const sess = await mongoose.startSession();
@@ -321,13 +320,13 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not complete product delete',
-      500
+      500,
     );
     return next(error);
   }
 
   const imagePath = deleteProd[0].image;
-  fs.unlink(imagePath, (err) => {
+  fs.unlink(imagePath, err => {
     console.log(err);
   });
 
