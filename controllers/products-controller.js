@@ -3,10 +3,24 @@ const fs = require('fs');
 
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
+const { S3Client, PutObjectAclCommand } = require('@aws-sdk/client-s3');
 
 const HttpError = require('../models/http-error.js');
 const Product = require('../models/product');
 const User = require('../models/user');
+
+const bucketName = `${process.env.BUCKET_NAME}`;
+const bucketRegion = `${process.env.BUCKET_REGION}`;
+const accessKey = `${process.env.ACCESS_KEY}`;
+const secretAccessKey = `${process.env.SECRET_ACCESS_KEY}`;
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: accessKey,
+    secretAccessKey: secretAccessKey,
+  },
+  region: bucketRegion,
+});
 
 const getProductById = async (req, res, next) => {
   const prodId = req.params.pid;
@@ -19,7 +33,7 @@ const getProductById = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not find product',
-      500,
+      500
     );
 
     return next(error);
@@ -28,7 +42,7 @@ const getProductById = async (req, res, next) => {
   if (!product) {
     const error = new HttpError(
       'Could not find a place for the provided id',
-      404,
+      404
     );
     return next(error);
   }
@@ -46,7 +60,7 @@ const getProductsByUserId = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Fetching user products failed, please try again',
-      500,
+      500
     );
     return next(error);
   }
@@ -56,8 +70,8 @@ const getProductsByUserId = async (req, res, next) => {
   }
 
   res.json({
-    products: userWithProducts.products.map(product =>
-      product.toObject({ getters: true }),
+    products: userWithProducts.products.map((product) =>
+      product.toObject({ getters: true })
     ),
   });
 };
@@ -69,7 +83,7 @@ const createProduct = async (req, res, next) => {
   if (!errors.isEmpty()) {
     // console.log('validationResult: ', errors);
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422),
+      new HttpError('Invalid inputs passed, please check your data.', 422)
     );
   }
 
@@ -149,7 +163,7 @@ const createProduct = async (req, res, next) => {
     console.log(err.message);
     const error = new HttpError(
       'Creating place failed, please try again!',
-      500,
+      500
     );
     return next(error);
   }
@@ -161,7 +175,7 @@ const updateProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data', 422),
+      new HttpError('Invalid inputs passed, please check your data', 422)
     );
   }
 
@@ -200,7 +214,7 @@ const updateProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500,
+      500
     );
 
     return next(error);
@@ -212,7 +226,7 @@ const updateProduct = async (req, res, next) => {
   if (product[0].owner != req.userData.userId) {
     const error = new HttpError(
       'You are not authorized to edit this place.',
-      401,
+      401
     );
     return next(error);
   }
@@ -233,7 +247,7 @@ const updateProduct = async (req, res, next) => {
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
 
   if (req.file) {
-    fs.unlink(product[0].image, error => {
+    fs.unlink(product[0].image, (error) => {
       // console.log('app.use: ', error);
     });
     product[0].image = req.file.path;
@@ -242,7 +256,7 @@ const updateProduct = async (req, res, next) => {
   if (subscribers[0]) {
     const subArray = subscribers.split(',');
     product[0].subscribers = [];
-    subArray.forEach(sub => product[0].subscribers.push(+sub));
+    subArray.forEach((sub) => product[0].subscribers.push(+sub));
     product[0].datePublished = new Date().toISOString();
   }
 
@@ -266,7 +280,7 @@ const updateProduct = async (req, res, next) => {
     console.log(err);
     const error = new HttpError(
       'Something went wrong, could not update product',
-      500,
+      500
     );
     return next(error);
   }
@@ -288,7 +302,7 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not delete product',
-      500,
+      500
     );
 
     return next(error);
@@ -305,7 +319,7 @@ const deleteProduct = async (req, res, next) => {
   if (deleteProd[0].owner != req.userData.userId) {
     const error = new HttpError(
       'You are not authorized to delete this product.',
-      401,
+      401
     );
     return next(error);
   }
@@ -320,13 +334,13 @@ const deleteProduct = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       'Something went wrong, could not complete product delete',
-      500,
+      500
     );
     return next(error);
   }
 
   const imagePath = deleteProd[0].image;
-  fs.unlink(imagePath, err => {
+  fs.unlink(imagePath, (err) => {
     console.log(err);
   });
 
