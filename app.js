@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: `${process.env.CLIENT_URL}`,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
-  }),
+  })
 );
 
 app.use('/api/products', productsRoutes);
@@ -35,12 +35,12 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
-  if (req.file) {
-    console.log('req.file.path: ', req.file.path);
-    fs.unlink(req.file.path, error => {
-      console.log('app.use: ', error);
-    });
-  }
+  // if (req.file) {
+  //   console.log('req.file.path: ', req.file.path);
+  //   fs.unlink(req.file.path, error => {
+  //     console.log('app.use: ', error);
+  //   });
+  // }
 
   console.log('app.use: ', error.message);
   res.status(error.code || 500);
@@ -53,7 +53,7 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ykppkft.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
-    { useNewUrlParser: true, useUnifiedTopology: true },
+    { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => app.listen(process.env.PORT || 5000))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
