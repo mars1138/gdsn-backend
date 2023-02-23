@@ -7,6 +7,7 @@ const {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
@@ -280,11 +281,18 @@ const updateProduct = async (req, res, next) => {
   if (maxTemp) product[0].maxTemp = maxTemp;
   if (storageInstructions) product[0].storageInstructions = storageInstructions;
 
+  let fileType;
+  let oldImage;
+  let newImage;
+
   if (req.file) {
-    fs.unlink(product[0].image, (error) => {
-      // console.log('app.use: ', error);
-    });
-    product[0].image = req.file.path;
+    // fs.unlink(product[0].image, (error) => {
+    //   // console.log('app.use: ', error);
+    // });
+    fileType = req.file.mimetype.split('/')[1];
+    oldImage = product[0].image;
+    newImage = `${uuid()}.${fileType}`;
+    product[0].image = newImage;
   }
 
   if (subscribers[0]) {
@@ -309,7 +317,29 @@ const updateProduct = async (req, res, next) => {
   // console.log('product: ', product);
 
   try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
     await product[0].save();
+
+    if (req.file) {
+      //save new image
+      saveParams = {
+        Bucket: bucketName,
+        Key: newImage,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      };
+      await s3.send(new PutObjectCommand(saveParams));
+
+      //delete old image
+      deleteParams = {
+        Bucket: bucketName,
+        Key: oldImage,
+      };
+      await s3.send(new DeleteObjectCommand(deleteParams));
+    }
+
+    await sess.commitTransaction();
   } catch (err) {
     console.log(err);
     const error = new HttpError(
@@ -358,12 +388,23 @@ const deleteProduct = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = deleteProd[0].image;
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await deleteProd[0].remove({ session: sess });
     deleteUser.products.pull(deleteProd[0].id);
     await deleteUser.save({ session: sess });
+
+    if (imagePath) {
+      const params = {
+        Bucket: bucketName,
+        Key: imagePath,
+      };
+      await s3.send(new DeleteObjectCommand(params));
+    }
+
     await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
@@ -373,10 +414,9 @@ const deleteProduct = async (req, res, next) => {
     return next(error);
   }
 
-  const imagePath = deleteProd[0].image;
-  fs.unlink(imagePath, (err) => {
-    console.log(err);
-  });
+  // fs.unlink(imagePath, (err) => {
+  //   console.log(err);
+  // });
 
   res.status(200).json({
     message: `Product ${prodId} ${deleteProd[0].name} has been deleted`,
