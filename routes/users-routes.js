@@ -6,6 +6,8 @@ const fileUpload = require('../middleware/file-upload');
 
 const router = express.Router();
 
+router.options('*', (req, res) => res.sendStatus(200));
+
 router.get('/', usersControllers.getUsers);
 
 router.post(
