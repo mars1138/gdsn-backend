@@ -10,6 +10,8 @@ const productSchema = new Schema({
   type: { type: Number, required: true },
   image: { type: String, required: true },
   height: { type: String },
+  width: { type: String },
+  depth: { type: String },
   weight: { type: String },
   packagingType: { type: Number },
   tempUnits: { type: Number },
